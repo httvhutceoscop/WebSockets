@@ -1,5 +1,3 @@
-# WebSockets
-Chat Application
 How to run project:
 1. Require installing the NodeJS and NPM and ws module
 2. Open command window from server folder and run command: node index.js
