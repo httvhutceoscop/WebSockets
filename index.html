@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Web Sockets</title>
+	<link rel="stylesheet" href="">
+	<style type="text/css">
+		#log {
+			width: 320px;
+			height: 300px;
+			margin: 0 auto;
+			border: 5px solid black;
+			border-radius: 7px;
+			overflow: auto;
+		}
+		#sendCtrls {
+			width: 280px;
+			margin: 30px auto;
+		}
+	</style>
+</head>
+<body>
+	
+	<div id="log"></div>
+
+	<div id="sendCtrls">
+		<input type="text" placeholder="Your message" id="text" onkeypress="handleKeyPress(event)" />
+		<button>Send hello</button>
+	</div>
+
+	<script type="text/javascript">
+	// var sock = new WebSocket("wss://echo.websocket.org");
+	var name = prompt("What is your name fella?");
+
+	var g_sock = new WebSocket("ws://localhost:5001");	
+
+	var DEFAULT_MESSAGE = "";
+	var log = document.getElementById("log");
+	var g_InputMessage = document.getElementById("text");
+
+	g_sock.onopen = function (event) {
+		g_sock.send(JSON.stringify({
+			type: "name",
+			data: name
+		}));
+	}
+
+	g_sock.onmessage = function(event){
+		console.log(event);
+		var json = JSON.parse(event.data);
+		log.innerHTML += json.name + ": " + json.data + "<br/>";
+	};
+
+	document.querySelector("button").onclick = function() {
+		sendMessage();
+	};
+
+	function sendMessage(text = "") {
+		if (text == "") {
+			text = g_InputMessage.value;
+		}
+
+		g_sock.send(JSON.stringify({
+			type: "message",
+			data: text
+		}));
+
+		log.innerHTML += "You: " + text + "<br/>";
+		g_InputMessage.value = DEFAULT_MESSAGE;
+	}
+
+	function handleKeyPress(e) {
+		var key = e.keyCode || e.which;
+
+		if (key == 13) {
+			e.preventDefault();
+			sendMessage();
+		}
+	}
+
+	</script>
+</body>
+</html>
